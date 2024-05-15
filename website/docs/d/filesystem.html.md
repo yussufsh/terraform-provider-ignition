@@ -36,6 +36,8 @@ The following arguments are supported:
 
 * `options` - (Optional) Any additional options to be passed to the format-specific mkfs utility.
 
+* `mount_options` - (Optional) Any special options to be passed to the mount command.
+
 * `path` - (Optional) The mount-point of the filesystem while Ignition is running relative to where the root filesystem will be mounted. This is not necessarily the same as where it should be mounted in the real root, but it is encouraged to make it the same.
 
 ## Attributes Reference

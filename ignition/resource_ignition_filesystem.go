@@ -44,6 +44,12 @@ func dataSourceFilesystem() *schema.Resource {
 				ForceNew: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
+			"mount_options": {
+				Type:     schema.TypeList,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+			},
 			"path": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -112,7 +118,12 @@ func buildFilesystem(d *schema.ResourceData) (string, error) {
 
 	options, hasOptions := d.GetOk("options")
 	if hasOptions {
-		fs.Options = castSliceInterfaceToMountOption(options.([]interface{}))
+		fs.Options = castSliceInterfaceToFilesystemOptions(options.([]interface{}))
+	}
+
+	mountOptions, hasMountOptions := d.GetOk("mount_options")
+	if hasMountOptions {
+		fs.MountOptions = castSliceInterfaceToMountOptions(mountOptions.([]interface{}))
 	}
 
 	b, err := json.Marshal(fs)
@@ -127,7 +138,7 @@ func buildFilesystem(d *schema.ResourceData) (string, error) {
 	return hash(string(b)), handleReport(fs.Validate(vcontext_path.ContextPath{}))
 }
 
-func castSliceInterfaceToMountOption(i []interface{}) []types.FilesystemOption {
+func castSliceInterfaceToFilesystemOptions(i []interface{}) []types.FilesystemOption {
 	var o []types.FilesystemOption
 	for _, value := range i {
 		if value == nil {
@@ -135,6 +146,19 @@ func castSliceInterfaceToMountOption(i []interface{}) []types.FilesystemOption {
 		}
 
 		o = append(o, types.FilesystemOption(value.(string)))
+	}
+
+	return o
+}
+
+func castSliceInterfaceToMountOptions(i []interface{}) []types.MountOption {
+	var o []types.MountOption
+	for _, value := range i {
+		if value == nil {
+			continue
+		}
+
+		o = append(o, types.MountOption(value.(string)))
 	}
 
 	return o

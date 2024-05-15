@@ -20,7 +20,8 @@ func TestIgnitionFilesystem(t *testing.T) {
 			wipe_filesystem = true
 			label = "root"
 			uuid = "qux"
-			options = ["rw"]
+			options = ["-L", "test"]
+			mount_options = ["noexec"]
 		}
 		data "ignition_config" "test" {
 			filesystems = [
@@ -64,8 +65,12 @@ func TestIgnitionFilesystem(t *testing.T) {
 			return fmt.Errorf("wipe_filesystem, found %t", *f.WipeFilesystem)
 		}
 
-		if len(f.Options) != 1 || f.Options[0] != "rw" {
+		if len(f.Options) != 2 || f.Options[0] != "-L" || f.Options[1] != "test" {
 			return fmt.Errorf("options, found %q", f.Options)
+		}
+
+		if len(f.MountOptions) != 1 || f.MountOptions[0] != "noexec" {
+			return fmt.Errorf("mountOptions, found %q", f.MountOptions)
 		}
 
 		return nil
